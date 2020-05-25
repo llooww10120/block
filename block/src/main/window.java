@@ -37,6 +37,7 @@ public class window extends JPanel {
 	private int map[][]=new int [10][20];
 	private int reserveBlock ;
 	private int x=5,y=0;
+	private int downspeed=1000;
 	public window() {
 		myImage = new BufferedImage(xFRAME, yFRAME, BufferedImage.TYPE_INT_RGB);
 		myBuffer = myImage.getGraphics();
@@ -44,12 +45,12 @@ public class window extends JPanel {
 		addMouseListener(new Mouse());
 		addMouseMotionListener(new Mouse1());
 		setFocusable(true);
-		Timer clockTimer = new Timer(100, new ActionListener() {
+		Timer clockTimer = new Timer(downspeed, new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				Tblock.setY(Tblock.getX()+Tblock.getW());
+				Tblock.setY(Tblock.getY()+Tblock.getW());
 			}
 		});
 		Timer tesTimer = new Timer(100, new ActionListener() {
@@ -68,6 +69,7 @@ public class window extends JPanel {
 		});
 		initial();
 		tesTimer.start();
+		clockTimer.start();
 	}
 
 	private class Key implements KeyListener {

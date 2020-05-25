@@ -53,7 +53,7 @@ public class Terblock{
 	private int shape;
 	private Color color;
 	private int Rotatetype=0;
-	private int initialx = 7;
+	private int initialx = 5;
 	private int initialy = 0;
 	private int myX;
 	private int myY;
