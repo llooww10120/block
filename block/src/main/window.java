@@ -20,21 +20,19 @@ import javax.swing.Timer;
 public class window extends JPanel {
 	private BufferedImage myImage;
 	private Graphics myBuffer;
-	private block[] I;
-	public static final int FRAMEx = 200;
-	public static final int FRAMEy = 0;
+//	private block[] I;
+	public static final int FRAMEx = 150;
+	public static final int FRAMEy = 100;
 
-	public static final int xFRAME = 800;
+	public static final int xFRAME = 600;
 	public static final int yFRAME = 800;
-	public static final int xground = 400;
-	public static final int yground = 800;
+	public static final int xground = 300;
+	public static final int yground = 600;
 	private Terblock Tblock;
 	private int BlockType=0;
 	private int nextBlockType=0;
 
 	private int BlockRotateType = 0;
-	private int playground[][] = new int[10][20];
-	private boolean Rup = false,Rdown = false,Rleft = false,Rright = false;
 	private int Blockcontent[][][] = new int [4][4][4];
 	private int map[][]=new int [10][20];
 	private int reserveBlock ;
@@ -51,7 +49,7 @@ public class window extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				Tblock.setY(Tblock.getX()+Tblock.getH());
+				Tblock.setY(Tblock.getX()+Tblock.getW());
 			}
 		});
 		Timer tesTimer = new Timer(100, new ActionListener() {
@@ -78,8 +76,7 @@ public class window extends JPanel {
 				rotate(Tblock);
 			}
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-//				Rdown = true;
-				Tblock.setY(Tblock.getY()+Tblock.getH());
+				Tblock.setY(Tblock.getY()+Tblock.getW());
 			}
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				Tblock.setX(Tblock.getX()-Tblock.getW());
@@ -91,15 +88,6 @@ public class window extends JPanel {
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-//			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-//				Rdown = false;
-//			}
-//			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-//				Rleft = false;
-//			}
-//			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-//				Rright = false;
-//			}
 		}
 
 		public void keyTyped(KeyEvent e) {
@@ -156,17 +144,15 @@ public class window extends JPanel {
 		return true;
 	}
 	public void rotate(Terblock a) {
-//		if(collison(a,a.getX(),a.getY(),a.getshape(),a.getRotatetype())==false) {
 		BlockRotateType = ((BlockRotateType+1)%4);
 		a.setRotatetype(BlockRotateType);
-//		}
 		repaint();
 	}
 	private void intoMap(Terblock a,int x,int y,int blocktype,int blockRotateType) {
 		for(int i =0;i<4;i++) {
 			for(int j=0;j<4;j++) {
 				if(Blockcontent[blockRotateType][i][j]==1) {
-				map[x+j+1][y+i]=Blockcontent[blockRotateType][i][j];
+//				map[x][y+j]=Blockcontent[blockRotateType][i][j];
 				}
 			}
 		}
