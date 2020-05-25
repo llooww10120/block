@@ -152,6 +152,7 @@ public class Terblock{
 			}
 			if(k>=1) {
 				hight = (i+1)*width;
+				break;
 			}
 		}
 		return hight;
@@ -168,9 +169,6 @@ public class Terblock{
 		
 	}
 	
-	public boolean RotateOut() {
-		int temp=((Rotatetype+1)%4);
-	}
 	public int getshape() {
 		return shape;
 	}

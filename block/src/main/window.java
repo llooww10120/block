@@ -78,13 +78,13 @@ public class window extends JPanel {
 				rotate(Tblock);
 			}
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-				if(Tblock.getY()+Tblock.getlen()==FRAMEy+yground) {
+				if(Tblock.getY()+Tblock.getH()==FRAMEy+yground) {
 					Tblock.setY(Tblock.getY());
 				}
 				else {
 					Tblock.setY(Tblock.getY()+Tblock.getW());
 				}
-				
+				System.out.println("H="+Tblock.getH());
 				
 			}
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -166,6 +166,12 @@ public class window extends JPanel {
 		
 		BlockRotateType = ((BlockRotateType+1)%4);
 		a.setRotatetype(BlockRotateType);
+		if((a.getX()+a.getlen())>FRAMEx+xground) {
+			a.setX(FRAMEx+xground-a.getlen() );
+		}
+		if((a.getY()+a.getH())>FRAMEy+yground) {
+			a.setY(FRAMEy+yground-a.getH() );
+		}
 		repaint();
 	}
 	private void intoMap(Terblock a,int x,int y,int blocktype,int blockRotateType) {
