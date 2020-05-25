@@ -9,10 +9,10 @@ public class Terblock{
 	private int [][][]shapecontent =new int[4][4][4];
 
 	private final int[][][] Ishape= new int [][][] {
-		{{ 0, 0, 0, 0},{ 1, 1, 1, 1},{ 0, 0, 0, 0},{ 0, 0, 0, 0 }},
 		{{ 0, 1, 0, 0},{ 0, 1, 0, 0},{ 0, 1, 0, 0},{ 0, 1, 0, 0 }},
 		{{ 0, 0, 0, 0},{ 1, 1, 1, 1},{ 0, 0, 0, 0},{ 0, 0, 0, 0 }},
-        {{ 0, 1, 0, 0},{ 0, 1, 0, 0},{ 0, 1, 0, 0},{ 0, 1, 0, 0 }}
+        {{ 0, 1, 0, 0},{ 0, 1, 0, 0},{ 0, 1, 0, 0},{ 0, 1, 0, 0 }},
+        {{ 0, 0, 0, 0},{ 1, 1, 1, 1},{ 0, 0, 0, 0},{ 0, 0, 0, 0 }}
 		}; 
 	private final int[][][]Lshape = new int[][][] {
 		{{ 1, 0, 0, 0},{ 1, 0, 0, 0},{ 1, 1, 0, 0},{ 0, 0, 0, 0}},
@@ -58,7 +58,8 @@ public class Terblock{
 	private int myX;
 	private int myY;
 	private int width=30;
-//	private block blockshape[]= {new block(),new block(),new block(),new block()};
+	private int len;
+	private int hight;
 	//constructor
 	public Terblock(int shap) {
 		shape = shap;
@@ -108,11 +109,11 @@ public class Terblock{
 	}
 
 	public void setX(int x) {
-		myX=(x);
+		myX=x;
 //		
 	}
 	public void setY(int y) {
-		myY=(y);
+		myY=y;
 //		
 	}
 
@@ -126,7 +127,35 @@ public class Terblock{
 	public int getY() {
 		return myY;
 	}
-
+	public int getlen() {
+		int k=0;
+		for(int i=3;i>=0;i--) {
+			for(int j=0;j<4;j++) {
+				if(shapecontent[Rotatetype][i][j]==1) {
+					k+=1;
+				}
+			}
+			if(k>=1) {
+				len = (i+1)*width;
+				break;
+			}
+		}
+		return len;
+	}
+	public int getH() {
+		int k=0;
+		for(int i =3;i>=0;i--) {
+			for(int j=0;j<4;j++) {
+				if(shapecontent[Rotatetype][j][i]==1){
+					k+=1;
+				}
+			}
+			if(k>=1) {
+				hight = (i+1)*width;
+			}
+		}
+		return hight;
+	}
 	public void draw(Graphics myBuffer) {
 		for(int i =0;i<4;i++) {
 			for(int j=0;j<4;j++) {
@@ -137,6 +166,10 @@ public class Terblock{
 			}
 		}
 		
+	}
+	
+	public boolean RotateOut() {
+		int temp=((Rotatetype+1)%4);
 	}
 	public int getshape() {
 		return shape;

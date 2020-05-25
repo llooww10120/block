@@ -60,6 +60,8 @@ public class window extends JPanel {
 				myBuffer.fillRect(0, 0, xFRAME, yFRAME);
 				myBuffer.setColor(Color.WHITE);
 				myBuffer.fillRect(FRAMEx, FRAMEy, xground, yground);
+				myBuffer.setColor(Color.black);
+				myBuffer.fillRect(Tblock.getX(), Tblock.getY(), 10, 10);
 				Tblock.draw(myBuffer);
 				repaint();
 			}
@@ -76,13 +78,30 @@ public class window extends JPanel {
 				rotate(Tblock);
 			}
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-				Tblock.setY(Tblock.getY()+Tblock.getW());
+				if(Tblock.getY()+Tblock.getlen()==FRAMEy+yground) {
+					Tblock.setY(Tblock.getY());
+				}
+				else {
+					Tblock.setY(Tblock.getY()+Tblock.getW());
+				}
+				
+				
 			}
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-				Tblock.setX(Tblock.getX()-Tblock.getW());
+				if(Tblock.getX()==FRAMEx) {
+					Tblock.setX(Tblock.getX());
+				}else {
+					Tblock.setX(Tblock.getX()-Tblock.getW());
+				}
+				
 			}
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-				Tblock.setX(Tblock.getX()+Tblock.getW());
+				if(Tblock.getX()+Tblock.getlen()==FRAMEx+xground) {
+					Tblock.setX(Tblock.getX());
+				}else {
+					Tblock.setX(Tblock.getX()+Tblock.getW());
+				}
+				System.out.println("len="+Tblock.getlen());
 			}
 		}
 
@@ -144,6 +163,7 @@ public class window extends JPanel {
 		return true;
 	}
 	public void rotate(Terblock a) {
+		
 		BlockRotateType = ((BlockRotateType+1)%4);
 		a.setRotatetype(BlockRotateType);
 		repaint();
