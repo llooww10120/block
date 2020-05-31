@@ -68,13 +68,14 @@ public class window2 extends JPanel {
 				Tblock2.draw(myBuffer);				
 				bot(Tblock2);
 				draw(myBuffer);
+				collison();
 //				vanish();
 				repaint();
 			}
 		});
 		initial();
 		tesTimer.start();
-		clockTimer.start();
+//		clockTimer.start();
 	}
 
 	private class Key implements KeyListener {
@@ -91,7 +92,15 @@ public class window2 extends JPanel {
 				else {
 					Tblock2.setY(Tblock2.getY()+Tblock2.getW());
 				}
-				System.out.println("H="+Tblock2.getH());
+				for(int i =0;i<20;i++) {
+					for (int j=0;j<10;j++) {
+						System.out.print(map[j][i]);
+					}
+					System.out.println("");
+				}
+				System.out.println(Tblock2.getmapX());
+				System.out.println(Tblock2.getmapY());
+				System.out.println("------------------------------------");
 				
 			}
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -165,9 +174,20 @@ public class window2 extends JPanel {
 	}
 
 	//TODO
-	public  boolean collison(Terblock2 a,int x,int y,int Blocktype,int BlockRotateType) {
+	public  void collison() {
+		for(int i=0;i<4;i++) {
+			for(int j = 3;j>=0;j--) {
+				if(Blockcontent[Tblock2.getRotatetype()][j][i]>=1) {
+					if(Tblock2.getmapX()+i <10 &&Tblock2.getmapY()+j <20&&map[Tblock2.getmapX()+i][Tblock2.getmapY()+j+1]>=1 ) {
+						System.out.println(map[Tblock2.getmapX()+i][Tblock2.getmapY()+j+1]);
+						intoMap(Tblock2,Tblock2.getmapX(),Tblock2.getmapY(),Tblock2.getshape(),Tblock2.getRotatetype());
+						newblock();
+						break;
+					}
+				}
+			}
+		}
 		
-		return true;
 	}
 	public void bot(Terblock2 a) {
 		if(a.getY()+a.getH()==FRAMEy+yground) {
@@ -283,15 +303,15 @@ public class window2 extends JPanel {
 		}
 	
 	}
-//	public void vanish() {
-//		for(int i = 19;i>=0;i--) {
-//			if(map[i]==test) {
-//				for(int j =i;j>0;j--) {
-//					map[j]=map[j-1];
-//				}
-//			}
-//		}
-//	}
+	public void vanish() {
+		for(int i = 19;i>=0;i--) {
+			if(map[i]==test) {
+				for(int j =i;j>0;j--) {
+					map[j]=map[j-1];
+				}
+			}
+		}
+	}
 	public void paintComponent(Graphics g) {
 		g.drawImage(myImage, 0, 0, getWidth(), getHeight(), null);
 	}

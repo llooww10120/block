@@ -11,7 +11,7 @@ public class Driver {
         frame.setSize(600, 800);
         frame.setLocation(0, 0);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      	frame.setContentPane(new window());
+      	frame.setContentPane(new window2());
         frame.setVisible(true);
 	}
 
