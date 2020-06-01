@@ -6,6 +6,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="D:/Users/桌面/大學/大一/計算機/黃明勝_B10730026_星際大戰專題/黃明勝_B10730026_星際大戰專題/星際大戰/lib/MagicAudioPlayer.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

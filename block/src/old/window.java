@@ -1,4 +1,4 @@
-package main;
+package old;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -17,7 +17,7 @@ import javax.swing.Timer;
 
 
 
-public class window2 extends JPanel {
+public class window extends JPanel {
 	private BufferedImage myImage;
 	private Graphics myBuffer;
 //	private block[] I;
@@ -28,7 +28,7 @@ public class window2 extends JPanel {
 	public static final int yFRAME = 800;
 	public static final int xground = 300;
 	public static final int yground = 600;
-	private Terblock2 Tblock2;
+	private Terblock Tblock;
 	private int BlockType=0;
 	private int nextBlockType=0;
 
@@ -38,9 +38,7 @@ public class window2 extends JPanel {
 	private int reserveBlock ;
 	private int x=5,y=0;
 	private int downspeed=1000;
-	private int mX,mY;
-	private int test[]=new int[] {1,1,1,1,1,1,1,1,1,1};
-	public window2() {
+	public window() {
 		myImage = new BufferedImage(xFRAME, yFRAME, BufferedImage.TYPE_INT_RGB);
 		myBuffer = myImage.getGraphics();
 		addKeyListener(new Key());
@@ -52,7 +50,7 @@ public class window2 extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				Tblock2.setY(Tblock2.getY()+Tblock2.getW());
+				Tblock.setY(Tblock.getY()+Tblock.getW());
 			}
 		});
 		Timer tesTimer = new Timer(100, new ActionListener() {
@@ -64,18 +62,14 @@ public class window2 extends JPanel {
 				myBuffer.setColor(Color.WHITE);
 				myBuffer.fillRect(FRAMEx, FRAMEy, xground, yground);
 				myBuffer.setColor(Color.black);
-				myBuffer.fillRect(Tblock2.getX(), Tblock2.getY(), 10, 10);
-				Tblock2.draw(myBuffer);				
-				bot(Tblock2);
-				draw(myBuffer);
-				collison();
-//				vanish();
+				myBuffer.fillRect(Tblock.getX(), Tblock.getY(), 10, 10);
+				Tblock.draw(myBuffer);
 				repaint();
 			}
 		});
 		initial();
 		tesTimer.start();
-//		clockTimer.start();
+		clockTimer.start();
 	}
 
 	private class Key implements KeyListener {
@@ -83,41 +77,33 @@ public class window2 extends JPanel {
 		@Override
 		public void keyPressed(KeyEvent e) {
 			if (e.getKeyCode() == KeyEvent.VK_UP) {
-				rotate(Tblock2);
+				rotate(Tblock);
 			}
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-				if(Tblock2.getY()+Tblock2.getH()==FRAMEy+yground) {
-					Tblock2.setY(Tblock2.getY());
+				if(Tblock.getY()+Tblock.getH()==FRAMEy+yground) {
+					Tblock.setY(Tblock.getY());
 				}
 				else {
-					Tblock2.setY(Tblock2.getY()+Tblock2.getW());
+					Tblock.setY(Tblock.getY()+Tblock.getW());
 				}
-				for(int i =0;i<20;i++) {
-					for (int j=0;j<10;j++) {
-						System.out.print(map[j][i]);
-					}
-					System.out.println("");
-				}
-				System.out.println(Tblock2.getmapX());
-				System.out.println(Tblock2.getmapY());
-				System.out.println("------------------------------------");
+				System.out.println("H="+Tblock.getH());
 				
 			}
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-				if(Tblock2.getX()==FRAMEx) {
-					Tblock2.setX(Tblock2.getX());
+				if(Tblock.getX()==FRAMEx) {
+					Tblock.setX(Tblock.getX());
 				}else {
-					Tblock2.setX(Tblock2.getX()-Tblock2.getW());
+					Tblock.setX(Tblock.getX()-Tblock.getW());
 				}
 				
 			}
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-				if(Tblock2.getX()+Tblock2.getlen()==FRAMEx+xground) {
-					Tblock2.setX(Tblock2.getX());
+				if(Tblock.getX()+Tblock.getlen()==FRAMEx+xground) {
+					Tblock.setX(Tblock.getX());
 				}else {
-					Tblock2.setX(Tblock2.getX()+Tblock2.getW());
+					Tblock.setX(Tblock.getX()+Tblock.getW());
 				}
-				System.out.println("len="+Tblock2.getlen());
+				System.out.println("len="+Tblock.getlen());
 			}
 		}
 
@@ -174,84 +160,11 @@ public class window2 extends JPanel {
 	}
 
 	//TODO
-	public  void collison() {
-		for(int i=0;i<4;i++) {
-			for(int j = 3;j>=0;j--) {
-				if(Blockcontent[Tblock2.getRotatetype()][j][i]>=1) {
-					if(Tblock2.getmapX()+i <10 &&Tblock2.getmapY()+j <20&&map[Tblock2.getmapX()+i][Tblock2.getmapY()+j+1]>=1 ) {
-						System.out.println(map[Tblock2.getmapX()+i][Tblock2.getmapY()+j+1]);
-						intoMap(Tblock2,Tblock2.getmapX(),Tblock2.getmapY(),Tblock2.getshape(),Tblock2.getRotatetype());
-						newblock();
-						break;
-					}
-				}
-			}
-		}
+	public  boolean collison(Terblock a,int x,int y,int Blocktype,int BlockRotateType) {
 		
+		return true;
 	}
-	public void bot(Terblock2 a) {
-		if(a.getY()+a.getH()==FRAMEy+yground) {
-			intoMap(a,a.getmapX(),a.getmapY(),a.getshape(),a.getRotatetype());
-			newblock();
-		}
-	}
-	public int mX(int x) {
-		mX = FRAMEx + (Tblock2.getW()*x);
-		return mX;
-	}
-	public int mY(int y) {
-		mY = FRAMEy + (Tblock2.getW()*y);
-		return mY;
-	}
-	public void draw(Graphics g) {
-		for(int i=0;i<10;i++) {
-			for(int j=0;j<20;j++) {
-				switch (map[i][j]) {
-				case 1:
-					g.setColor(Color.PINK);
-					g.fillRect(mX(i), mY(j), Tblock2.getW(), Tblock2.getW());
-
-					break;
-				case 2:
-					g.setColor(Color.BLUE);
-					g.fillRect(mX(i), mY(j), Tblock2.getW(), Tblock2.getW());
-
-					break;
-				case 3:
-					g.setColor(Color.GREEN);				
-					g.fillRect(mX(i), mY(j), Tblock2.getW(), Tblock2.getW());
-
-					break;
-				case 4:
-					g.setColor(Color.ORANGE);
-					g.fillRect(mX(i), mY(j), Tblock2.getW(), Tblock2.getW());
-
-					break;
-				case 5:
-					g.setColor(Color.RED);
-					g.fillRect(mX(i), mY(j), Tblock2.getW(), Tblock2.getW());
-
-					break;
-				case 6:
-					g.setColor(Color.CYAN);
-					g.fillRect(mX(i), mY(j), Tblock2.getW(), Tblock2.getW());
-
-					break;
-				case 7:
-					g.setColor(Color.YELLOW);
-					g.fillRect(mX(i), mY(j), Tblock2.getW(), Tblock2.getW());
-
-					break;
-
-				default:
-//					g.setColor(Color.WHITE);
-					break;
-				
-				}
-			}
-		}
-	}
-	public void rotate(Terblock2 a) {
+	public void rotate(Terblock a) {
 		
 		BlockRotateType = ((BlockRotateType+1)%4);
 		a.setRotatetype(BlockRotateType);
@@ -263,11 +176,11 @@ public class window2 extends JPanel {
 		}
 		repaint();
 	}
-	private void intoMap(Terblock2 a,int x,int y,int blocktype,int blockRotateType) {
+	private void intoMap(Terblock a,int x,int y,int blocktype,int blockRotateType) {
 		for(int i =0;i<4;i++) {
 			for(int j=0;j<4;j++) {
-				if(Blockcontent[blockRotateType][i][j]>=1) {
-					map[x+i][y+j]=Blockcontent[blockRotateType][i][j];
+				if(Blockcontent[blockRotateType][i][j]==1) {
+//				map[x][y+j]=Blockcontent[blockRotateType][i][j];
 				}
 			}
 		}
@@ -282,8 +195,8 @@ public class window2 extends JPanel {
 	}
 	public void newblock() {
 		BlockType = nextBlockType;
-		Tblock2= new Terblock2(BlockType);
-		Blockcontent=Tblock2.getcontent();
+		Tblock= new Terblock(BlockType);
+		Blockcontent=Tblock.getcontent();
 		nextBlockType = (int)(Math.random()*7+1);
 	}
 	
@@ -302,15 +215,6 @@ public class window2 extends JPanel {
 			BlockType = temp;
 		}
 	
-	}
-	public void vanish() {
-		for(int i = 19;i>=0;i--) {
-			if(map[i]==test) {
-				for(int j =i;j>0;j--) {
-					map[j]=map[j-1];
-				}
-			}
-		}
 	}
 	public void paintComponent(Graphics g) {
 		g.drawImage(myImage, 0, 0, getWidth(), getHeight(), null);
