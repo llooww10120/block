@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -19,14 +20,14 @@ public class window extends JPanel {
 	private BufferedImage myImage;
 	private Graphics myBuffer;
 //	private block[] I;
-	public static final int FRAMEx = 100;
+	public static final int FRAMEx = 150;
 	public static final int FRAMEy = 100;
-
 	public static final int xFRAME = 600;
 	public static final int yFRAME = 800;
 	public static final int xground = 300;
 	public static final int yground = 600;
-	public static final int Xnextblock = 420;
+	public static final int Xnextblock = 460;
+	public static final int XResblock = 40;
 	public static final int Ynextblock = 100;
 
 	private Terblock Tblock;
@@ -40,7 +41,11 @@ public class window extends JPanel {
 	private int x = 5, y = 0;
 	private int downspeed = 1000;
 	private int mX, mY;
-	private int nextblockW ;
+	private int nextblockW;
+	private boolean nodelay=false;
+	private boolean down;
+	private Timer clockTimer,gameTimer;
+	private boolean Res = true;
 	public window() {
 		myImage = new BufferedImage(xFRAME, yFRAME, BufferedImage.TYPE_INT_RGB);
 		myBuffer = myImage.getGraphics();
@@ -48,16 +53,17 @@ public class window extends JPanel {
 		addMouseListener(new Mouse());
 		addMouseMotionListener(new Mouse1());
 		setFocusable(true);
-		Timer clockTimer = new Timer(downspeed, new ActionListener() {
+		clockTimer = new Timer(downspeed, new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				Tblock.setY(Tblock.getY() + Tblock.getW());
-				verticalcol();
+				if(verticalcol()) {
+					Tblock.setY(Tblock.getY() + Tblock.getW());
+				}
 			}
 		});
-		Timer tesTimer = new Timer(100, new ActionListener() {
+		gameTimer = new Timer(100, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
@@ -65,21 +71,21 @@ public class window extends JPanel {
 				myBuffer.fillRect(0, 0, xFRAME, yFRAME);
 				myBuffer.setColor(Color.WHITE);
 				myBuffer.fillRect(Xnextblock, Ynextblock, 100, 100);
+				myBuffer.fillRect(XResblock, Ynextblock, 100, 100);
 				myBuffer.fillRect(FRAMEx, FRAMEy, xground, yground);
 				myBuffer.setColor(Color.black);
 				myBuffer.fillRect(Tblock.getX(), Tblock.getY(), 10, 10);
 				Tblock.draw(myBuffer);
 				bot(Tblock);
 				drawNextBlock(myBuffer);
+				drawReserveBlock(myBuffer);
 				draw(myBuffer);
-			
-	
 				vanish();
 				repaint();
 			}
 		});
 		initial();
-		tesTimer.start();
+		gameTimer.start();
 		clockTimer.start();
 	}
 
@@ -91,26 +97,16 @@ public class window extends JPanel {
 				rotate(Tblock);
 			}
 			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+				nodelay=true;
 				if (verticalcol()) {
 					if (Tblock.getY() + Tblock.getH() == FRAMEy + yground) {
 						Tblock.setY(Tblock.getY());
 					} else {
 						Tblock.setY(Tblock.getY() + Tblock.getW());
 					}
-//					for (int i = 0; i < 20; i++) {
-//						for (int j = 0; j < 10; j++) {
-//							System.out.print(map[j][i]);
-//						}
-//						System.out.println("");
-//					}
-//					System.out.println(Tblock.getmapX());
-//					System.out.println(Tblock.getmapY());
-//					System.out.println("------------------------------------");
 				}
 			}
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-				System.out.print(Tblock.getX());
-
 				if (!horizontalcol(-1)) {
 					if (Tblock.getX() == FRAMEx) {
 						Tblock.setX(Tblock.getX());
@@ -126,13 +122,21 @@ public class window extends JPanel {
 					} else {
 						Tblock.setX(Tblock.getX() + Tblock.getW());
 					}
-					System.out.println("len=" + Tblock.getlen());
 				}
+			}
+			if(e.getKeyCode()==KeyEvent.VK_C) {
+				reserveBlock();
+			}
+			if(e.getKeyCode()==KeyEvent.VK_SPACE) {
+				downtobot();
 			}
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
+			if(e.getKeyCode()==KeyEvent.VK_DOWN) {
+				nodelay = false;
+			}
 		}
 
 		public void keyTyped(KeyEvent e) {
@@ -182,31 +186,42 @@ public class window extends JPanel {
 		}
 
 	}
-
+	public void downtobot() {
+		if(verticalcol()&&!bot(Tblock)) {
+			Tblock.setY(Tblock.getY()+Tblock.getW());
+			downtobot();
+		}
+		
+	}
 	// TODO
 	public boolean verticalcol() {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 3; j >= 0; j--) {
 				if (Blockcontent[Tblock.getRotatetype()][j][i] >= 1) {
-					if (Tblock.getmapX() + i < 10 && Tblock.getmapY() + j + 1 < 20) {
-//						System.out.println("down=" + (map[Tblock.getmapX() + i][Tblock.getmapY() + j + 1]));
-//						System.out.println("mapx=" + (Tblock.getmapX() + i) + "mapY=" + (Tblock.getmapY() + j)
-//								+ "con=" + Blockcontent[Tblock.getRotatetype()][j][i]);
-//						System.out.println("rot=" + Tblock.getRotatetype());
-
-						if (map[Tblock.getmapX() + i][Tblock.getmapY() + j + 1] >= 1) {
-							intoMap(Tblock, Tblock.getmapX(), Tblock.getmapY(), Tblock.getshape(),
-									Tblock.getRotatetype());
-							newblock();
-							return false;
+					if (Tblock.getmapX() + i < 10 && Tblock.getmapY() + j  < 20) {
+						try {
+							if (map[Tblock.getmapX() + i][Tblock.getmapY() + j + 1] >= 1) {
+								if(nodelay) {
+									TimeUnit.SECONDS.sleep((long) 0.5);
+								}
+								intoMap(Tblock, Tblock.getmapX(), Tblock.getmapY(), Tblock.getshape(),
+										Tblock.getRotatetype());
+								newblock();
+								Res=true;
+								return false;
+							}
+						}catch (Exception e) {
+							// TODO: handle exception
+							System.out.println("IndexOutofRange");
 						}
+						
 					}
 				}
 			}
 		}
 		return true;
 	}
-
+	
 	public boolean horizontalcol(int k) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -222,11 +237,42 @@ public class window extends JPanel {
 		return false;
 	}
 
-	public void bot(Terblock a) {
-		if (a.getY() + a.getH() == FRAMEy + yground) {
+	public boolean mapcol() {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				if (Tblock.getcontent()[((BlockRotateType + 1) % 4)][j][i] >= 1) {
+					try {
+						if (map[Tblock.getmapX() + i][Tblock.getmapY() + j] >= 1) {
+							return true;
+						}
+					}
+					catch (Exception e) {
+						// TODO: handle exception
+						System.out.println("IndexOutOfRange");
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean bot(Terblock a) {
+		if (a.getY() + a.getH() >= FRAMEy + yground) {
+			if(nodelay) {
+				try {
+					TimeUnit.SECONDS.sleep((long) 0.5);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			Tblock.setY(FRAMEy+yground-Tblock.getH());
 			intoMap(a, a.getmapX(), a.getmapY(), a.getshape(), a.getRotatetype());
 			newblock();
+			Res=true;
+			return true;
 		}
+		return false;
 	}
 
 	public int mX(int x) {
@@ -289,16 +335,17 @@ public class window extends JPanel {
 	}
 
 	public void rotate(Terblock a) {
-		
-		BlockRotateType = ((BlockRotateType + 1) % 4);
-		a.setRotatetype(BlockRotateType);
-		if ((a.getX() + a.getlen()) > FRAMEx + xground) {
-			a.setX(FRAMEx + xground - a.getlen());
+		if (!mapcol()) {
+			BlockRotateType = ((BlockRotateType + 1) % 4);
+			a.setRotatetype(BlockRotateType);
+			if ((a.getX() + a.getlen()) > FRAMEx + xground) {
+				a.setX(FRAMEx + xground - a.getlen());
+			}
+			if ((a.getY() + a.getH()) > FRAMEy + yground) {
+				a.setY(FRAMEy + yground - a.getH());
+			}
+			repaint();
 		}
-		if ((a.getY() + a.getH()) > FRAMEy + yground) {
-			a.setY(FRAMEy + yground - a.getH());
-		}
-		repaint();
 	}
 
 	private void intoMap(Terblock a, int x, int y, int blocktype, int blockRotateType) {
@@ -310,7 +357,17 @@ public class window extends JPanel {
 			}
 		}
 	}
-
+	public void gameover() {
+		for(int i=0;i<10;i++) {
+			if(map[i][0]>=1) {
+				if(clockTimer.isRunning()&&gameTimer.isRunning()) {
+					clockTimer.stop();
+					gameTimer.stop();
+					return;
+				}
+			}
+		}
+	}
 	public void initial() {
 		map = new int[10][20];
 		myBuffer.setColor(Color.WHITE);
@@ -321,26 +378,36 @@ public class window extends JPanel {
 	}
 
 	public void newblock() {
+		gameover();
 		BlockType = nextBlockType;
 		Tblock = new Terblock(BlockType);
 		Blockcontent = Tblock.getcontent();
 		nextBlockType = (int) (Math.random() * 7 + 1);
 	}
-
+	public void newblock(int blocktype) {
+		gameover();
+		Tblock = new Terblock(blocktype);
+		Blockcontent = Tblock.getcontent();
+	}
 	public void nextblock() {
 		nextBlockType = (int) (Math.random() * 7 + 1);
 	}
 
 	public void reserveBlock() {
-		if (reserveBlock == 0) {
-			reserveBlock = BlockType;
-			BlockType = nextBlockType;
-		} else {
-			int temp = 0;
-			temp = reserveBlock;
-			reserveBlock = BlockType;
-			BlockType = temp;
+		if(Res) {
+			Res = false;
+			if (reserveBlock == 0) {
+				reserveBlock = BlockType;
+				newblock();
+			} else {
+				int temp = 0;
+				temp = reserveBlock;
+				reserveBlock = BlockType;
+				BlockType = temp;
+				newblock(BlockType);
+			}
 		}
+	
 
 	}
 
@@ -364,44 +431,51 @@ public class window extends JPanel {
 	}
 
 	public void drawNextBlock(Graphics g) {
-		nextblockW = Tblock.getW()-10;
+		nextblockW = Tblock.getW() - 10;
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				if (Terblock.getcontent(nextBlockType)[0][j][i] >= 1) {
 					switch (nextBlockType) {
 					case 1:
 						g.setColor(Color.PINK);
-						g.fillRect(Xnextblock+i*nextblockW+10, Ynextblock+j*nextblockW+10, nextblockW, nextblockW);
+						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
 
 						break;
 					case 2:
 						g.setColor(Color.BLUE);
-						g.fillRect(Xnextblock+i*nextblockW+10, Ynextblock+j*nextblockW+10, nextblockW, nextblockW);
+						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
 
 						break;
 					case 3:
 						g.setColor(Color.GREEN);
-						g.fillRect(Xnextblock+i*nextblockW+10, Ynextblock+j*nextblockW+10, nextblockW, nextblockW);
+						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
 
 						break;
 					case 4:
 						g.setColor(Color.ORANGE);
-						g.fillRect(Xnextblock+i*nextblockW+10, Ynextblock+j*nextblockW+10, nextblockW, nextblockW);
+						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
 
 						break;
 					case 5:
 						g.setColor(Color.RED);
-						g.fillRect(Xnextblock+i*nextblockW+10, Ynextblock+j*nextblockW+10, nextblockW, nextblockW);
+						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
 
 						break;
 					case 6:
 						g.setColor(Color.CYAN);
-						g.fillRect(Xnextblock+i*nextblockW+10, Ynextblock+j*nextblockW+10, nextblockW, nextblockW);
+						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
 
 						break;
 					case 7:
 						g.setColor(Color.YELLOW);
-						g.fillRect(Xnextblock+i*nextblockW+10, Ynextblock+j*nextblockW+10, nextblockW, nextblockW);
+						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
 
 						break;
 
@@ -409,12 +483,69 @@ public class window extends JPanel {
 //						g.setColor(Color.WHITE);
 						break;
 					}
-					
+
 				}
 			}
 		}
 	}
+	public void drawReserveBlock(Graphics g) {
+		nextblockW = Tblock.getW() - 10;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				if (Terblock.getcontent(reserveBlock)[0][j][i] >= 1) {
+					switch (reserveBlock) {
+					case 1:
+						g.setColor(Color.PINK);
+						g.fillRect(XResblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
 
+						break;
+					case 2:
+						g.setColor(Color.BLUE);
+						g.fillRect(XResblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
+
+						break;
+					case 3:
+						g.setColor(Color.GREEN);
+						g.fillRect(XResblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
+
+						break;
+					case 4:
+						g.setColor(Color.ORANGE);
+						g.fillRect(XResblock+ i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
+
+						break;
+					case 5:
+						g.setColor(Color.RED);
+						g.fillRect(XResblock+ i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
+
+						break;
+					case 6:
+						g.setColor(Color.CYAN);
+						g.fillRect(XResblock+ i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
+
+						break;
+					case 7:
+						g.setColor(Color.YELLOW);
+						g.fillRect(XResblock+ i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
+								nextblockW);
+
+						break;
+
+					default:
+//						g.setColor(Color.WHITE);
+						break;
+					}
+
+				}
+			}
+		}
+	}
 	public void paintComponent(Graphics g) {
 		g.drawImage(myImage, 0, 0, getWidth(), getHeight(), null);
 	}
