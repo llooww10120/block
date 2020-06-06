@@ -24,13 +24,14 @@ import javax.swing.Timer;
 
 public class window extends JPanel {
 //	private static final JLabel backmenu= new JLabel();
-	private static final ImageIcon backmenu = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\backmenu.gif");
-	private static final ImageIcon card = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\card.png");
-	private static final ImageIcon backmenu1 = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\backmenu1.png");
-	private static final ImageIcon hanged = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\hanged.png");
-	private static final ImageIcon death = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\death.png");
-	private static final ImageIcon devil = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\devil.png");
-	private static final ImageIcon fortune = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\fortune.png");
+	private static final ImageIcon backmenu = new ImageIcon("./imagebackmenu.gif");
+	private static final ImageIcon card = new ImageIcon("./image/card.png");
+	private static final ImageIcon backmenu1 = new ImageIcon("./image/backmenu1.png");
+	private static final ImageIcon hanged = new ImageIcon("./image/hanged.png");
+	private static final ImageIcon death = new ImageIcon("./image/death.png");
+	private static final ImageIcon devil = new ImageIcon("./image/devil.png");
+	private static final ImageIcon fortune = new ImageIcon("./image/fortune.png");
+
 	
 	private BufferedImage myImage;
 	private Graphics2D myBuffer;
@@ -65,6 +66,7 @@ public class window extends JPanel {
 	private boolean down;
 	private Timer gifTimer,resultTimer, clockTimer,gameTimer;
 	private boolean Res = true;
+	private boolean start=false;
 	public window() {
 		myImage = new BufferedImage(xFRAME, yFRAME, BufferedImage.TYPE_INT_RGB);
 		myBuffer = (Graphics2D)myImage.getGraphics();
@@ -124,7 +126,7 @@ public class window extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-
+			
 				myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
 				myBuffer.setColor(Color.WHITE);
 				myBuffer.fillRect(Xnextblock, Ynextblock, 100, 100);
@@ -196,9 +198,13 @@ public class window extends JPanel {
 				downtobot();
 			}
 			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-				initial();
-				gameTimer.start();
-				clockTimer.start();
+				if(start) {
+					initial();
+					gameTimer.start();
+					clockTimer.start();
+					start= false;
+				}
+			
 			}
 		}
 
@@ -228,6 +234,7 @@ public class window extends JPanel {
 			}
 			else if(resultTimer.isRunning()) {
 				resultTimer.stop();
+
 				if (0<=cardnumber&&cardnumber<=25) {
 					myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
 					myBuffer.drawImage(fortune.getImage(), 150, 200, 300, 400, null);
@@ -250,6 +257,7 @@ public class window extends JPanel {
 					myBuffer.drawImage(death.getImage(), 150, 200, 300, 400, null);
 					repaint();
 				}
+				start = true;
 			}
 		}
 
@@ -357,20 +365,18 @@ public class window extends JPanel {
 	}
 
 	public boolean bot(Terblock a) {
-		if (a.getY() + a.getH() >= FRAMEy + yground) {
-			if(nodelay) {
-				try {
-					TimeUnit.SECONDS.sleep((long) 0.5);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		try {
+			if (a.getY() + a.getH() >= FRAMEy + yground) {
+				Tblock.setY(FRAMEy+yground-Tblock.getH());
+				intoMap(a, a.getmapX(), a.getmapY(), a.getshape(), a.getRotatetype());
+				newblock();
+				Res=true;
+				return true;
 			}
-			Tblock.setY(FRAMEy+yground-Tblock.getH());
-			intoMap(a, a.getmapX(), a.getmapY(), a.getshape(), a.getRotatetype());
-			newblock();
-			Res=true;
-			return true;
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			return false;
 		}
 		return false;
 	}
@@ -387,7 +393,11 @@ public class window extends JPanel {
 
 	public void draw(Graphics g) {
 		for (int i = 0; i < 10; i++) {
+			g.setColor(Color.BLACK);
+			g.drawLine(FRAMEx+i*Tblock.getW(), FRAMEy, FRAMEx+i*Tblock.getW(), FRAMEy+yground);
 			for (int j = 0; j < 20; j++) {
+				g.setColor(Color.BLACK);
+				g.drawLine(FRAMEx, FRAMEy+j*Tblock.getW(), FRAMEx+xground, FRAMEy+j*Tblock.getW());
 				switch (map[i][j]) {
 				case 1:
 					g.setColor(Color.PINK);

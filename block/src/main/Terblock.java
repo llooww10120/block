@@ -9,9 +9,9 @@ public class Terblock {
 	// case 1
 	private final static int[][][] Tshape = new int[][][] {
 			{ { 0, 1, 0, 0 }, { 1, 1, 1, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } },
-			{ { 0, 1, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 } },
-			{ { 1, 1, 1, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } },
-			{ { 1, 0, 0, 0 }, { 1, 1, 0, 0 }, { 1, 0, 0, 0 }, { 0, 0, 0, 0 } } };
+			{ { 1, 0, 0, 0 }, { 1, 1, 0, 0 }, { 1, 0, 0, 0 }, { 0, 0, 0, 0 } },
+			{ { 1, 1, 1, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }, 
+			{ { 0, 1, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 } }};
 	// case 2
 	private final static int[][][] Lshape = new int[][][] {
 			{ { 2, 0, 0, 0 }, { 2, 0, 0, 0 }, { 2, 2, 0, 0 }, { 0, 0, 0, 0 } },
@@ -61,7 +61,6 @@ public class Terblock {
 
 	// constructor
 	public Terblock(int shap) {
-		System.out.print(window.FRAMEx);
 		shape = shap;
 		myX = window.FRAMEx + initialx * getW();
 		myY = window.FRAMEy + initialy * getW();
@@ -173,7 +172,17 @@ public class Terblock {
 		}
 
 	}
+	public void draw(Graphics myBuffer,int y) {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				if (shapecontent[Rotatetype][j][i] >= 1) {
+					myBuffer.setColor(color);
+					myBuffer.fillRect(myX + i * getW(), myY+y+ j * getW(), getW(), getW());
+				}
+			}
+		}
 
+	}
 	public int getmapX() {
 		mapX = (myX - window.FRAMEx) / width;
 		return mapX;
