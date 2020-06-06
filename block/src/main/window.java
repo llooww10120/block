@@ -1,7 +1,10 @@
 package main;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -13,12 +16,24 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class window extends JPanel {
+//	private static final JLabel backmenu= new JLabel();
+	private static final ImageIcon backmenu = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\backmenu.gif");
+	private static final ImageIcon card = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\card.png");
+	private static final ImageIcon backmenu1 = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\backmenu1.png");
+	private static final ImageIcon hanged = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\hanged.png");
+	private static final ImageIcon death = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\death.png");
+	private static final ImageIcon devil = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\devil.png");
+	private static final ImageIcon fortune = new ImageIcon("C:\\Users\\SPK\\git\\block\\block\\src\\main\\fortune.png");
+	
 	private BufferedImage myImage;
-	private Graphics myBuffer;
+	private Graphics2D myBuffer;
 //	private block[] I;
 	public static final int FRAMEx = 150;
 	public static final int FRAMEy = 100;
@@ -29,8 +44,12 @@ public class window extends JPanel {
 	public static final int Xnextblock = 460;
 	public static final int XResblock = 40;
 	public static final int Ynextblock = 100;
+	public static final int Yscore = 250;
 
 	private Terblock Tblock;
+	private int cardnumber = 0;
+	private int difficulty = 0;
+	private int score = 0;
 	private int BlockType = 0;
 	private int nextBlockType = 0;
 
@@ -44,16 +63,54 @@ public class window extends JPanel {
 	private int nextblockW;
 	private boolean nodelay=false;
 	private boolean down;
-	private Timer clockTimer,gameTimer;
+	private Timer gifTimer,resultTimer, clockTimer,gameTimer;
 	private boolean Res = true;
 	public window() {
 		myImage = new BufferedImage(xFRAME, yFRAME, BufferedImage.TYPE_INT_RGB);
-		myBuffer = myImage.getGraphics();
+		myBuffer = (Graphics2D)myImage.getGraphics();
+
 		addKeyListener(new Key());
 		addMouseListener(new Mouse());
 		addMouseMotionListener(new Mouse1());
 		setFocusable(true);
-		clockTimer = new Timer(downspeed, new ActionListener() {
+		
+		resultTimer = new Timer(100, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cardnumber = (int) (Math.random()*100);
+
+				if (0<=cardnumber&&cardnumber<=25) {
+					myBuffer.drawImage(fortune.getImage(), 0, 0, xFRAME, yFRAME, null);
+					repaint();
+				}
+				else if(25<=cardnumber&&cardnumber<=50) {
+					myBuffer.drawImage(hanged.getImage(), 0, 0, xFRAME, yFRAME, null);
+					repaint();
+				}
+				else if(50<=cardnumber&&cardnumber<=75) {
+					myBuffer.drawImage(devil.getImage(), 0, 0, xFRAME, yFRAME, null);
+					repaint();
+				}
+				else if(75<=cardnumber&&cardnumber<=100) {
+					myBuffer.drawImage(death.getImage(), 0, 0, xFRAME, yFRAME, null);
+					repaint();
+				}
+			}
+		});
+		gifTimer = new Timer(100, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
+				
+				
+				
+				myBuffer.drawImage(card.getImage(), 95, 125, 56, 72, null);
+				myBuffer.drawImage(card.getImage(), 74, 98, 42, 54, null);
+				myBuffer.drawImage(card.getImage(), 60, 80, 28, 36, null);
+				myBuffer.setFont(new Font("Serif", Font.ITALIC, 60));
+				myBuffer.drawString("What's Your Destiny?", 70, 70);
+				repaint();
+			}
+		});
+		clockTimer = new Timer(1000, new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -67,14 +124,23 @@ public class window extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				myBuffer.setColor(Color.black);
-				myBuffer.fillRect(0, 0, xFRAME, yFRAME);
+
+				myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
 				myBuffer.setColor(Color.WHITE);
 				myBuffer.fillRect(Xnextblock, Ynextblock, 100, 100);
 				myBuffer.fillRect(XResblock, Ynextblock, 100, 100);
+				myBuffer.fillRect(Xnextblock, Yscore, 100, 100);
 				myBuffer.fillRect(FRAMEx, FRAMEy, xground, yground);
+				myBuffer.setColor(Color.magenta);
+				myBuffer.setFont(new Font("Dialog", Font.ITALIC, 35));
+				myBuffer.drawString("HOLD", 47, 100);
+				myBuffer.drawString("NEXT", 467, 100);
+				myBuffer.drawString("SCORE", 462, 250);
+				myBuffer.setColor(Color.BLACK);
+				myBuffer.drawString(Integer.toString(score), 490, 305);
 				myBuffer.setColor(Color.black);
 				myBuffer.fillRect(Tblock.getX(), Tblock.getY(), 10, 10);
+				setdownspeed();
 				Tblock.draw(myBuffer);
 				bot(Tblock);
 				drawNextBlock(myBuffer);
@@ -84,9 +150,8 @@ public class window extends JPanel {
 				repaint();
 			}
 		});
-		initial();
-		gameTimer.start();
-		clockTimer.start();
+		gifTimer.start();
+
 	}
 
 	private class Key implements KeyListener {
@@ -130,6 +195,11 @@ public class window extends JPanel {
 			if(e.getKeyCode()==KeyEvent.VK_SPACE) {
 				downtobot();
 			}
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+				initial();
+				gameTimer.start();
+				clockTimer.start();
+			}
 		}
 
 		@Override
@@ -150,7 +220,37 @@ public class window extends JPanel {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			// TODO Auto-generated method stub
+			if(gifTimer.isRunning()) {
+				gifTimer.stop();
+				resultTimer.start();
 
+				
+			}
+			else if(resultTimer.isRunning()) {
+				resultTimer.stop();
+				if (0<=cardnumber&&cardnumber<=25) {
+					myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
+					myBuffer.drawImage(fortune.getImage(), 150, 200, 300, 400, null);
+					repaint();
+
+					
+				}
+				if (25<=cardnumber&&cardnumber<=50) {
+					myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
+					myBuffer.drawImage(hanged.getImage(), 150, 200, 300, 400, null);
+					repaint();
+				}
+				if (50<=cardnumber&&cardnumber<=75) {
+					myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
+					myBuffer.drawImage(devil.getImage(), 150, 200, 300, 400, null);
+					repaint();
+				}
+				if (75<=cardnumber&&cardnumber<=100) {
+					myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
+					myBuffer.drawImage(death.getImage(), 150, 200, 300, 400, null);
+					repaint();
+				}
+			}
 		}
 
 		public void mousePressed(MouseEvent e) {
@@ -425,6 +525,7 @@ public class window extends JPanel {
 						map[k][j] = map[k][j - 1];
 					}
 				}
+				score += 100;
 			}
 		}
 
@@ -544,6 +645,28 @@ public class window extends JPanel {
 
 				}
 			}
+		}
+	}
+	public void setdownspeed() {
+		if(0<=score&&score<=100) {
+			
+			downspeed = 1000;
+		}
+		else if(100<score&&score<=1000) {
+			System.out.print("speed:"+downspeed);
+			downspeed = 800;
+		}
+		else if(1000<score&&score<=1400) {
+			downspeed = 600;
+		}
+		else if(1400<score&&score<=1700) {
+			downspeed = 500;
+		}
+		else if(1700<score&&score<=2000) {
+			downspeed = 400;
+		}
+		else if(2000<score) {
+			downspeed = 300;
 		}
 	}
 	public void paintComponent(Graphics g) {
