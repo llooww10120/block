@@ -68,11 +68,13 @@ public class window extends JPanel {
 	public window() {
 		myImage = new BufferedImage(xFRAME, yFRAME, BufferedImage.TYPE_INT_RGB);
 		myBuffer = (Graphics2D)myImage.getGraphics();
-
 		addKeyListener(new Key());
 		addMouseListener(new Mouse());
 		setFocusable(true);
-		
+		/**
+		 * @author 趙熙寧
+		 * 遊戲初始畫面
+		 */
 		resultTimer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				backgroundsound.pause();
@@ -81,7 +83,6 @@ public class window extends JPanel {
 				backgroundsound.setVolume(6);
 				backgroundsound.play();
 				cardnumber = (int) (Math.random()*100);
-
 				if (0<=cardnumber&&cardnumber<=25) {
 					b = 20;
 					FRAMEy = 100;
@@ -113,6 +114,11 @@ public class window extends JPanel {
 				}
 			}
 		});
+		/**
+		 * @author 趙熙寧
+		 * 隨機設定行數
+		 * 隨機決定關卡難度
+		 */
 		gifTimer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
@@ -171,7 +177,6 @@ public class window extends JPanel {
 		backgroundsound.play();
 
 	}
-
 	private class Key implements KeyListener {
 
 		@Override
@@ -307,14 +312,21 @@ public class window extends JPanel {
 
 		}
 	}
-
+	/**
+	 * @author 明勝
+	 * 直接下降到最下面
+	 */
 	public void downtobot() {
 		if(verticalcol()&&!bot(Tblock)) {
 			Tblock.setY(Tblock.getY()+Tblock.getW());
 			downtobot();
 		}
 	}
-	// TODO
+	/**
+	 * @author 明勝
+	 * @return boolean
+	 * 判斷block下方是否有方塊
+	 */
 	public boolean verticalcol() {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 3; j >= 0; j--) {
@@ -341,7 +353,12 @@ public class window extends JPanel {
 		}
 		return true;
 	}
-	
+	/**
+	 * @author 明勝
+	 * @param k 左右
+	 * @return boolean
+	 * 判斷左右是否碰撞
+	 */
 	public boolean horizontalcol(int k) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -356,7 +373,11 @@ public class window extends JPanel {
 		}
 		return false;
 	}
-
+	/**
+	 * @author 明勝
+	 * 判斷旋轉後是否會撞到旁邊的方塊
+	 * @return boolean
+	 */
 	public boolean mapcol() {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -375,7 +396,12 @@ public class window extends JPanel {
 		}
 		return false;
 	}
-
+	/**
+	 * @author 明勝
+	 * @param e Tblock
+	 * @return boolean
+	 * 判斷是否撞到最底層
+	 */
 	public boolean bot(Terblock e) {
 		try {
 			if (e.getY() + e.getH() >= FRAMEy +yground) {
@@ -395,16 +421,31 @@ public class window extends JPanel {
 		}
 		return false;
 	}
-
+	/**
+	 * @author 明勝
+	 * @param x map的x  	
+	 * @return mX 實際的x
+	 * 將map的x轉成panel中的x
+	 */
 	public int mX(int x) {
 		mX = FRAMEx + (Tblock.getW() * x);
 		return mX;
 	}
-
+	/**
+	 * @author 明勝
+	 * @param y map的y
+	 * @return mY 實際的y
+	 * 將map的y轉成panel中的y
+	 */
 	public int mY(int y) {
 		mY = FRAMEy + (Tblock.getW() * y);
 		return mY;
 	}
+	/**
+	 * @author 明勝
+	 * @param g
+	 * 將地圖中已存在的方塊畫出
+	 */
 	public void draw(Graphics g) {
 		for (int i = 0; i < 10; i++) {
 			g.setColor(Color.BLACK);
@@ -456,7 +497,11 @@ public class window extends JPanel {
 			}
 		}
 	}
-
+	/**
+	 * @author 明勝
+	 * @param a Tblock
+	 * 旋轉方塊
+	 */
 	public void rotate(Terblock a) {
 		if (!mapcol()) {
 			BlockRotateType = ((BlockRotateType + 1) % 4);
@@ -470,7 +515,15 @@ public class window extends JPanel {
 			repaint();
 		}
 	}
-
+	/**
+	 * @author 明勝
+	 * @param a Tblock
+	 * @param x mapX
+	 * @param y mapY
+	 * @param blocktype Tblock的形狀
+	 * @param blockRotateType Tblock目前旋轉的代號
+	 * 將已經碰撞的方塊寫入地圖中
+	 */
 	private void intoMap(Terblock a, int x, int y, int blocktype, int blockRotateType) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -480,6 +533,10 @@ public class window extends JPanel {
 			}
 		}
 	}
+	/**
+	 * @author 明勝
+	 * 判斷是否遊戲結束
+	 */
 	public void gameover() {
 		for(int i=0;i<10;i++) {
 			if(map[i][0]>=1) {
@@ -498,6 +555,10 @@ public class window extends JPanel {
 			}
 		}
 	}
+	/**
+	 * @author 明勝
+	 * 初始化遊戲
+	 */
 	public void initial() {
 		map = new int[10][b];
 		myBuffer.setColor(Color.WHITE);
@@ -506,7 +567,10 @@ public class window extends JPanel {
 		nextBlockType = (int) (Math.random() * 7 + 1);
 		newblock();
 	}
-
+	/**
+	 * @author 明勝
+	 * 新增下一個方塊
+	 */
 	public void newblock() {
 		gameover();
 		BlockType = nextBlockType;
@@ -514,15 +578,20 @@ public class window extends JPanel {
 		Blockcontent = Tblock.getcontent();
 		nextBlockType = (int) (Math.random() * 7 + 1);
 	}
+	/**
+	 * @author 明勝
+	 * @param blocktype 指定型號
+	 * 指定下一個方塊
+	 */
 	public void newblock(int blocktype) {
 		gameover();
 		Tblock = new Terblock(blocktype);
 		Blockcontent = Tblock.getcontent();
 	}
-	public void nextblock() {
-		nextBlockType = (int) (Math.random() * 7 + 1);
-	}
-
+	/**
+	 * @author 明勝
+	 * 保留方塊
+	 */
 	public void reserveBlock() {
 		if(Res) {
 			Res = false;
@@ -538,7 +607,10 @@ public class window extends JPanel {
 			}
 		}
 	}
-
+	/**
+	 * @author 明勝
+	 * 將一整列的方塊消除
+	 */
 	public void vanish() {
 		for (int i = 0; i < b; i++) {
 			int v = 0;
@@ -571,7 +643,11 @@ public class window extends JPanel {
 			}
 		}
 	}
-
+	/**
+	 * @author 明勝
+	 * @param g
+	 * 畫出下一個方塊的形狀
+	 */
 	public void drawNextBlock(Graphics g) {
 		nextblockW = Tblock.getW() - 10;
 		for (int i = 0; i < 4; i++) {
@@ -621,6 +697,11 @@ public class window extends JPanel {
 			}
 		}
 	}
+	/**
+	 * @author 明勝
+	 * @param g
+	 * 畫出保留方塊的形狀
+	 */
 	public void drawReserveBlock(Graphics g) {
 		nextblockW = Tblock.getW() - 10;
 		for (int i = 0; i < 4; i++) {
@@ -677,6 +758,11 @@ public class window extends JPanel {
 			}
 		}
 	}
+	/**
+	 * 
+	 * @author 明勝
+	 *方塊隨時間下移
+	 */
 	private class clockTimer implements ActionListener{
 
 		@Override
@@ -688,6 +774,10 @@ public class window extends JPanel {
 		}
 		
 	}
+	/**
+	 * @author 趙熙寧
+	 * 根據得分變更方塊落下速度
+	 */
 	public void speedRefresh() {
 		if(score==100) {
 			downspeed = 800;

@@ -58,8 +58,12 @@ public class Terblock {
 	private int width = 30;
 	private int len, hight;
 	private int mapX, mapY;
-
-	// constructor
+	/**
+	 * @author 明勝
+	 * @param shap 形狀
+	 * constructor
+	 * 根據 shap 給  shapecontent 
+	 */
 	public Terblock(int shap) {
 		shape = shap;
 		myX = window.FRAMEx + initialx * getW();
@@ -108,13 +112,11 @@ public class Terblock {
 	}
 
 	public void setX(int x) {
-		myX = x;
-//		
+		myX = x;	
 	}
 
 	public void setY(int y) {
 		myY = y;
-//		
 	}
 
 	public int getW() {
@@ -144,7 +146,10 @@ public class Terblock {
 		}
 		return len;
 	}
-
+	/**
+	 * @author 明勝
+	 * @return 方塊的高度
+	 */
 	public int getH() {
 		int k = 0;
 		for (int i = 3; i >= 0; i--) {
@@ -160,7 +165,7 @@ public class Terblock {
 		}
 		return hight;
 	}
-
+	
 	public void draw(Graphics myBuffer) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -172,31 +177,34 @@ public class Terblock {
 		}
 
 	}
-	public void draw(Graphics myBuffer,int y) {
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				if (shapecontent[Rotatetype][j][i] >= 1) {
-					myBuffer.setColor(color);
-					myBuffer.fillRect(myX + i * getW(), myY+y+ j * getW(), getW(), getW());
-				}
-			}
-		}
-
-	}
+	/**
+	 * @author 明勝
+	 * @return 對應地圖的X
+	 */
 	public int getmapX() {
 		mapX = (myX - window.FRAMEx) / width;
 		return mapX;
 	}
-
+	/**
+	 * @author 明勝
+	 * @return 對應地圖的Y
+	 */
 	public int getmapY() {
 		mapY = (myY - window.FRAMEy) / width;
 		return mapY;
 	}
-
+	/**
+	 * @author 明勝
+	 * @return 形狀代號
+	 */
 	public int getshape() {
 		return shape;
 	}
-
+	/**
+	 * @author 明勝
+	 * @param shape 形狀
+	 * @return 內容
+	 */
 	public static int[][][] getcontent(int shape) {
 		int[][][] content = new int[4][4][4];
 		switch (shape) {
@@ -227,11 +235,17 @@ public class Terblock {
 		}
 		return content;
 	}
-
+	/**
+	 * @author 明勝
+	 * @return 當下的內容
+	 */
 	public int[][][] getcontent() {
 		return shapecontent;
 	}
-
+	/**
+	 * @author 明勝
+	 * @return 當下旋轉的代號
+	 */
 	public int getRotatetype() {
 		return Rotatetype;
 	}
