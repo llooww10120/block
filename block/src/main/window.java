@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -11,37 +10,37 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.util.Map;
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import org.magiclen.media.AudioPlayer;
 
 public class window extends JPanel {
-//	private static final JLabel backmenu= new JLabel();
-	private static final ImageIcon backmenu = new ImageIcon("./imagebackmenu.gif");
+
+	private static final ImageIcon backmenu = new ImageIcon("./image/backmenu.gif");
 	private static final ImageIcon card = new ImageIcon("./image/card.png");
-	private static final ImageIcon backmenu1 = new ImageIcon("./image/backmenu1.png");
 	private static final ImageIcon hanged = new ImageIcon("./image/hanged.png");
 	private static final ImageIcon death = new ImageIcon("./image/death.png");
 	private static final ImageIcon devil = new ImageIcon("./image/devil.png");
 	private static final ImageIcon fortune = new ImageIcon("./image/fortune.png");
+	private static final ImageIcon win = new ImageIcon("./image/win.png");
+	private static final ImageIcon loss = new ImageIcon("./image/loss.png");
 
 	
 	private BufferedImage myImage;
 	private Graphics2D myBuffer;
 //	private block[] I;
 	public static final int FRAMEx = 150;
-	public static final int FRAMEy = 100;
 	public static final int xFRAME = 600;
 	public static final int yFRAME = 800;
 	public static final int xground = 300;
-	public static final int yground = 600;
+	public static int FRAMEy;
+	public static int yground;
+
 	public static final int Xnextblock = 460;
 	public static final int XResblock = 40;
 	public static final int Ynextblock = 100;
@@ -49,50 +48,66 @@ public class window extends JPanel {
 
 	private Terblock Tblock;
 	private int cardnumber = 0;
-	private int difficulty = 0;
 	private int score = 0;
 	private int BlockType = 0;
 	private int nextBlockType = 0;
 
 	private int BlockRotateType = 0;
 	private int Blockcontent[][][] = new int[4][4][4];
-	private int map[][] = new int[10][20];
+	private int b;
+	private int map[][] = new int[10][b];
 	private int reserveBlock;
-	private int x = 5, y = 0;
 	private int downspeed = 1000;
 	private int mX, mY;
 	private int nextblockW;
 	private boolean nodelay=false;
-	private boolean down;
 	private Timer gifTimer,resultTimer, clockTimer,gameTimer;
 	private boolean Res = true;
 	private boolean start=false;
+	private AudioPlayer backgroundsound;
 	public window() {
 		myImage = new BufferedImage(xFRAME, yFRAME, BufferedImage.TYPE_INT_RGB);
 		myBuffer = (Graphics2D)myImage.getGraphics();
 
 		addKeyListener(new Key());
 		addMouseListener(new Mouse());
-		addMouseMotionListener(new Mouse1());
 		setFocusable(true);
 		
 		resultTimer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backgroundsound.pause();
+				File g = new File("./sound/whichone.wav");
+				backgroundsound = new AudioPlayer(g);
+				backgroundsound.setVolume(6);
+				backgroundsound.play();
 				cardnumber = (int) (Math.random()*100);
 
 				if (0<=cardnumber&&cardnumber<=25) {
+					b = 20;
+					FRAMEy = 100;
+					yground = 600;
 					myBuffer.drawImage(fortune.getImage(), 0, 0, xFRAME, yFRAME, null);
 					repaint();
+					
 				}
 				else if(25<=cardnumber&&cardnumber<=50) {
+					b = 18;
+					FRAMEy = 160;
+					yground = 540;
 					myBuffer.drawImage(hanged.getImage(), 0, 0, xFRAME, yFRAME, null);
 					repaint();
 				}
 				else if(50<=cardnumber&&cardnumber<=75) {
+					b = 16;
+					FRAMEy = 220;
+					yground = 480;
 					myBuffer.drawImage(devil.getImage(), 0, 0, xFRAME, yFRAME, null);
 					repaint();
 				}
 				else if(75<=cardnumber&&cardnumber<=100) {
+					b = 14;
+					FRAMEy = 280;
+					yground = 420;
 					myBuffer.drawImage(death.getImage(), 0, 0, xFRAME, yFRAME, null);
 					repaint();
 				}
@@ -101,27 +116,23 @@ public class window extends JPanel {
 		gifTimer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
-				
-				
-				
+				myBuffer.drawImage(card.getImage(), 361, 458, 189, 243, null);
+				myBuffer.drawImage(card.getImage(), 280, 356, 161, 207, null);
+				myBuffer.drawImage(card.getImage(), 210, 266, 140, 180, null);
+				myBuffer.drawImage(card.getImage(), 158, 197, 105, 135, null);
+				myBuffer.drawImage(card.getImage(), 123, 152, 70, 90, null);
 				myBuffer.drawImage(card.getImage(), 95, 125, 56, 72, null);
 				myBuffer.drawImage(card.getImage(), 74, 98, 42, 54, null);
 				myBuffer.drawImage(card.getImage(), 60, 80, 28, 36, null);
 				myBuffer.setFont(new Font("Serif", Font.ITALIC, 60));
 				myBuffer.drawString("What's Your Destiny?", 70, 70);
 				repaint();
+				
 			}
 		});
-		clockTimer = new Timer(1000, new ActionListener() {
+		
+		clockTimer = new Timer(downspeed, new clockTimer());
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				if(verticalcol()) {
-					Tblock.setY(Tblock.getY() + Tblock.getW());
-				}
-			}
-		});
 		gameTimer = new Timer(100, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -142,7 +153,8 @@ public class window extends JPanel {
 				myBuffer.drawString(Integer.toString(score), 490, 305);
 				myBuffer.setColor(Color.black);
 				myBuffer.fillRect(Tblock.getX(), Tblock.getY(), 10, 10);
-				setdownspeed();
+				
+				
 				Tblock.draw(myBuffer);
 				bot(Tblock);
 				drawNextBlock(myBuffer);
@@ -153,6 +165,10 @@ public class window extends JPanel {
 			}
 		});
 		gifTimer.start();
+		File g = new File("./sound/cover.wav");
+		backgroundsound = new AudioPlayer(g);
+		backgroundsound.setVolume(5);
+		backgroundsound.play();
 
 	}
 
@@ -199,12 +215,17 @@ public class window extends JPanel {
 			}
 			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 				if(start) {
+					backgroundsound.pause();
 					initial();
 					gameTimer.start();
 					clockTimer.start();
+					
+					File a = new File("./sound/main.wav");
+					backgroundsound = new AudioPlayer(a);
+					backgroundsound.setVolume(6);
+					backgroundsound.play();
 					start= false;
 				}
-			
 			}
 		}
 
@@ -227,13 +248,18 @@ public class window extends JPanel {
 		public void mouseClicked(MouseEvent e) {
 			// TODO Auto-generated method stub
 			if(gifTimer.isRunning()) {
+				
 				gifTimer.stop();
 				resultTimer.start();
-
-				
+				start= false;
 			}
 			else if(resultTimer.isRunning()) {
+				backgroundsound.stop();
 				resultTimer.stop();
+				File d = new File("./sound/devil_laughing.wav");
+				backgroundsound = new AudioPlayer(d);
+				backgroundsound.setVolume(6);
+				backgroundsound.play();
 
 				if (0<=cardnumber&&cardnumber<=25) {
 					myBuffer.drawImage(backmenu.getImage(), 0, 0, xFRAME, yFRAME, null);
@@ -280,33 +306,20 @@ public class window extends JPanel {
 			// TODO Auto-generated method stub
 
 		}
-
 	}
 
-	private class Mouse1 implements MouseMotionListener {
-
-		public void mouseDragged(MouseEvent e) {
-
-		}
-
-		public void mouseMoved(MouseEvent e) {
-
-		}
-
-	}
 	public void downtobot() {
 		if(verticalcol()&&!bot(Tblock)) {
 			Tblock.setY(Tblock.getY()+Tblock.getW());
 			downtobot();
 		}
-		
 	}
 	// TODO
 	public boolean verticalcol() {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 3; j >= 0; j--) {
 				if (Blockcontent[Tblock.getRotatetype()][j][i] >= 1) {
-					if (Tblock.getmapX() + i < 10 && Tblock.getmapY() + j  < 20) {
+					if (Tblock.getmapX() + i < 10 && Tblock.getmapY() + j  < b) {
 						try {
 							if (map[Tblock.getmapX() + i][Tblock.getmapY() + j + 1] >= 1) {
 								if(nodelay) {
@@ -322,7 +335,6 @@ public class window extends JPanel {
 							// TODO: handle exception
 							System.out.println("IndexOutofRange");
 						}
-						
 					}
 				}
 			}
@@ -333,7 +345,7 @@ public class window extends JPanel {
 	public boolean horizontalcol(int k) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				if (Tblock.getmapX() + i + k < 10 && Tblock.getmapY() + j < 20 && Tblock.getmapX() + i + k > 0) {
+				if (Tblock.getmapX() + i + k < 10 && Tblock.getmapY() + j < b && Tblock.getmapX() + i + k > 0) {
 					if (Blockcontent[Tblock.getRotatetype()][j][i] >= 1) {
 						if (map[Tblock.getmapX() + i + k][Tblock.getmapY() + j] >= 1) {
 							return true;
@@ -364,17 +376,20 @@ public class window extends JPanel {
 		return false;
 	}
 
-	public boolean bot(Terblock a) {
+	public boolean bot(Terblock e) {
 		try {
-			if (a.getY() + a.getH() >= FRAMEy + yground) {
+			if (e.getY() + e.getH() >= FRAMEy +yground) {
 				Tblock.setY(FRAMEy+yground-Tblock.getH());
-				intoMap(a, a.getmapX(), a.getmapY(), a.getshape(), a.getRotatetype());
+				if(nodelay) {
+					TimeUnit.SECONDS.sleep((long) 0.5);
+				}
+				intoMap(e, e.getmapX(), e.getmapY(), e.getshape(), e.getRotatetype());
 				newblock();
 				Res=true;
 				return true;
 			}
 		}
-		catch (Exception e) {
+		catch (Exception f) {
 			// TODO: handle exception
 			return false;
 		}
@@ -390,12 +405,11 @@ public class window extends JPanel {
 		mY = FRAMEy + (Tblock.getW() * y);
 		return mY;
 	}
-
 	public void draw(Graphics g) {
 		for (int i = 0; i < 10; i++) {
 			g.setColor(Color.BLACK);
 			g.drawLine(FRAMEx+i*Tblock.getW(), FRAMEy, FRAMEx+i*Tblock.getW(), FRAMEy+yground);
-			for (int j = 0; j < 20; j++) {
+			for (int j = 0; j < b; j++) {
 				g.setColor(Color.BLACK);
 				g.drawLine(FRAMEx, FRAMEy+j*Tblock.getW(), FRAMEx+xground, FRAMEy+j*Tblock.getW());
 				switch (map[i][j]) {
@@ -436,9 +450,8 @@ public class window extends JPanel {
 					break;
 
 				default:
-//					g.setColor(Color.WHITE);
-					break;
 
+					break;
 				}
 			}
 		}
@@ -461,7 +474,7 @@ public class window extends JPanel {
 	private void intoMap(Terblock a, int x, int y, int blocktype, int blockRotateType) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				if (Blockcontent[blockRotateType][j][i] >= 1 && y + j < 20) {
+				if (Blockcontent[blockRotateType][j][i] >= 1 && y + j < b) {
 					map[x + i][y + j] = Blockcontent[blockRotateType][j][i];
 				}
 			}
@@ -473,13 +486,20 @@ public class window extends JPanel {
 				if(clockTimer.isRunning()&&gameTimer.isRunning()) {
 					clockTimer.stop();
 					gameTimer.stop();
+					myBuffer.drawImage(loss.getImage(), 0, 0, xFRAME, yFRAME, null);
+					repaint();
+					backgroundsound.pause();
+					File a = new File("./sound/destruction1.wav");
+					backgroundsound = new AudioPlayer(a);
+					backgroundsound.setVolume(6);
+					backgroundsound.play();
 					return;
 				}
 			}
 		}
 	}
 	public void initial() {
-		map = new int[10][20];
+		map = new int[10][b];
 		myBuffer.setColor(Color.WHITE);
 		myBuffer.fillRect(FRAMEx, FRAMEy, xground, yground);
 		BlockType = (int) (Math.random() * 7 + 1);
@@ -517,12 +537,10 @@ public class window extends JPanel {
 				newblock(BlockType);
 			}
 		}
-	
-
 	}
 
 	public void vanish() {
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < b; i++) {
 			int v = 0;
 			for (int k = 0; k < 10; k++) {
 				if (map[k][i] >= 1) {
@@ -536,9 +554,22 @@ public class window extends JPanel {
 					}
 				}
 				score += 100;
+				if(score<2500) {
+					speedRefresh();
+				}
+				else {
+					clockTimer.stop();
+					gameTimer.stop();
+					myBuffer.drawImage(win.getImage(), 0, 0, xFRAME, yFRAME, null);
+					repaint();
+					backgroundsound.pause();
+					File a = new File("./sound/wins.wav");
+					backgroundsound = new AudioPlayer(a);
+					backgroundsound.setVolume(6);
+					backgroundsound.play();
+				}
 			}
 		}
-
 	}
 
 	public void drawNextBlock(Graphics g) {
@@ -551,50 +582,41 @@ public class window extends JPanel {
 						g.setColor(Color.PINK);
 						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
 								nextblockW);
-
 						break;
 					case 2:
 						g.setColor(Color.BLUE);
 						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
 								nextblockW);
-
 						break;
 					case 3:
 						g.setColor(Color.GREEN);
 						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
 								nextblockW);
-
 						break;
 					case 4:
 						g.setColor(Color.ORANGE);
 						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
 								nextblockW);
-
 						break;
 					case 5:
 						g.setColor(Color.RED);
 						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
 								nextblockW);
-
 						break;
 					case 6:
 						g.setColor(Color.CYAN);
 						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
 								nextblockW);
-
 						break;
 					case 7:
 						g.setColor(Color.YELLOW);
 						g.fillRect(Xnextblock + i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
 								nextblockW);
-
 						break;
 
 					default:
-//						g.setColor(Color.WHITE);
 						break;
 					}
-
 				}
 			}
 		}
@@ -627,7 +649,6 @@ public class window extends JPanel {
 						g.setColor(Color.ORANGE);
 						g.fillRect(XResblock+ i * nextblockW + 10, Ynextblock + j * nextblockW + 10, nextblockW,
 								nextblockW);
-
 						break;
 					case 5:
 						g.setColor(Color.RED);
@@ -649,34 +670,58 @@ public class window extends JPanel {
 						break;
 
 					default:
-//						g.setColor(Color.WHITE);
+
 						break;
 					}
-
 				}
 			}
 		}
 	}
-	public void setdownspeed() {
-		if(0<=score&&score<=100) {
-			
-			downspeed = 1000;
+	private class clockTimer implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			if(verticalcol()) {
+				Tblock.setY(Tblock.getY() + Tblock.getW());
+			}
 		}
-		else if(100<score&&score<=1000) {
-			System.out.print("speed:"+downspeed);
+		
+	}
+	public void speedRefresh() {
+		if(score==100) {
 			downspeed = 800;
+			clockTimer = new Timer(downspeed, new clockTimer());
+			clockTimer.restart();
+
 		}
-		else if(1000<score&&score<=1400) {
+		if(score==1000) {
 			downspeed = 600;
+			clockTimer = new Timer(downspeed, new clockTimer());
+			clockTimer.restart();
+
+
 		}
-		else if(1400<score&&score<=1700) {
-			downspeed = 500;
-		}
-		else if(1700<score&&score<=2000) {
+		if(score==1400) {
 			downspeed = 400;
+			clockTimer = new Timer(downspeed, new clockTimer());
+			clockTimer.restart();
+
+
 		}
-		else if(2000<score) {
+		if(score==1700) {
 			downspeed = 300;
+			clockTimer = new Timer(downspeed, new clockTimer());
+			clockTimer.restart();
+
+
+		}
+		if(score==2000) {
+			downspeed = 200;
+			clockTimer = new Timer(downspeed, new clockTimer());
+			clockTimer.restart();
+
+
 		}
 	}
 	public void paintComponent(Graphics g) {
